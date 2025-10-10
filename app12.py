@@ -403,7 +403,7 @@ base_template_html = """
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #F3F4F6; }
         .header { background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -420,48 +420,75 @@ base_template_html = """
     {% block head_extra %}{% endblock %}
 </head>
 <body class="flex flex-col min-h-screen">
-    <header class="header sticky top-0 z-50 p-4 flex flex-wrap justify-between items-center">
-        <div class="flex items-center">
-            <i class="fas fa-lungs fa-2x subheading"></i>
-            <h1 class="text-xl sm:text-2xl font-bold heading ml-3">Pulmonology Department</h1>
-        </div>
-        <nav class="flex items-center space-x-2 sm:space-x-4 mt-2 sm:mt-0 text-sm sm:text-base">
-            {% if current_user.is_authenticated %}
-                <a href="{{ url_for('index') }}" class="text-gray-600 hover:text-[#3a86d7]">Dashboard</a>
-                <a href="{{ url_for('patients_list') }}" class="text-gray-600 hover:text-[#3a86d7]">Patients</a>
-                <!-- Services Dropdown -->
-                <div class="relative" x-data="{ open: false }">
-                    <button @click="open = !open" @click.away="open = false" class="text-gray-600 hover:text-[#3a86d7] inline-flex items-center">
-                        <span>Services</span>
-                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </button>
-                    <div x-show="open"
-                         x-transition:enter="transition ease-out duration-100"
-                         x-transition:enter-start="transform opacity-0 scale-95"
-                         x-transition:enter-end="transform opacity-100 scale-100"
-                         x-transition:leave="transition ease-in duration-75"
-                         x-transition:leave-start="transform opacity-100 scale-100"
-                         x-transition:leave-end="transform opacity-0 scale-95"
-                         class="absolute right-0 mt-2 w-48 origin-top-right bg-white rounded-md shadow-lg z-20"
-                         style="display: none;">
-                        <div class="py-1">
-                            <a href="{{ url_for('lab_request') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Lab Tests</a>
-                            <a href="{{ url_for('radiology_request') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Radiology</a>
+    <header x-data="{ open: false }" class="header sticky top-0 z-50 p-4">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center">
+                <i class="fas fa-lungs fa-2x subheading"></i>
+                <h1 class="text-xl sm:text-2xl font-bold heading ml-3">Pulmonology Dept.</h1>
+            </div>
+
+            <div class="md:hidden">
+                <button @click="open = !open" class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <nav class="hidden md:flex items-center space-x-4 text-base">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('index') }}" class="text-gray-600 hover:text-[#3a86d7]">Dashboard</a>
+                    <a href="{{ url_for('patients_list') }}" class="text-gray-600 hover:text-[#3a86d7]">Patients</a>
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" @click.away="open = false" class="text-gray-600 hover:text-[#3a86d7] inline-flex items-center">
+                            <span>Services</span>
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div x-show="open"
+                             x-transition
+                             class="absolute right-0 mt-2 w-48 origin-top-right bg-white rounded-md shadow-lg z-20"
+                             style="display: none;">
+                            <div class="py-1">
+                                <a href="{{ url_for('lab_request') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Lab Tests</a>
+                                <a href="{{ url_for('radiology_request') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Radiology</a>
+                            </div>
                         </div>
                     </div>
-                </div>
-                {% if current_user.role == 'Admin' %}
-                <a href="{{ url_for('manage_users') }}" class="text-gray-600 hover:text-[#3a86d7]">Users</a>
+                    {% if current_user.role == 'Admin' %}
+                    <a href="{{ url_for('manage_users') }}" class="text-gray-600 hover:text-[#3a86d7]">Users</a>
+                    {% endif %}
+                    {% if current_user.role in [Role.ADMIN, Role.IT_EXECUTIVE] %}
+                    <a href="{{ url_for('view_audit_log') }}" class="text-gray-600 hover:text-[#3a86d7]">Audit Log</a>
+                    {% endif %}
+                    <span class="text-gray-500">Welcome, {{ current_user.username }} ({{ current_user.role }})</span>
+                    <a href="{{ url_for('logout') }}" class="btn btn-secondary text-sm">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-primary">Login</a>
                 {% endif %}
-                {% if current_user.role in [Role.ADMIN, Role.IT_EXECUTIVE] %}
-                <a href="{{ url_for('view_audit_log') }}" class="text-gray-600 hover:text-[#3a86d7]">Audit Log</a>
+            </nav>
+        </div>
+
+        <div x-show="open" @click.away="open = false" class="md:hidden mt-4" style="display: none;">
+            <nav class="flex flex-col space-y-2">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('index') }}" class="text-gray-600 hover:bg-gray-100 rounded p-2">Dashboard</a>
+                    <a href="{{ url_for('patients_list') }}" class="text-gray-600 hover:bg-gray-100 rounded p-2">Patients</a>
+                    <a href="{{ url_for('lab_request') }}" class="text-gray-600 hover:bg-gray-100 rounded p-2">Lab Tests</a>
+                    <a href="{{ url_for('radiology_request') }}" class="text-gray-600 hover:bg-gray-100 rounded p-2">Radiology</a>
+                    {% if current_user.role == 'Admin' %}
+                    <a href="{{ url_for('manage_users') }}" class="text-gray-600 hover:bg-gray-100 rounded p-2">Users</a>
+                    {% endif %}
+                    {% if current_user.role in [Role.ADMIN, Role.IT_EXECUTIVE] %}
+                    <a href="{{ url_for('view_audit_log') }}" class="text-gray-600 hover:bg-gray-100 rounded p-2">Audit Log</a>
+                    {% endif %}
+                    <div class="border-t my-2"></div>
+                    <div class="p-2 text-gray-500">Welcome, {{ current_user.username }} ({{ current_user.role }})</div>
+                    <a href="{{ url_for('logout') }}" class="text-red-500 hover:bg-red-50 rounded p-2">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-primary">Login</a>
                 {% endif %}
-                <span class="hidden sm:inline text-gray-500">Welcome, {{ current_user.username }} ({{ current_user.role }})</span>
-                <a href="{{ url_for('logout') }}" class="btn btn-secondary text-xs sm:text-sm">Logout</a>
-            {% else %}
-                <a href="{{ url_for('login') }}" class="btn btn-primary">Login</a>
-            {% endif %}
-        </nav>
+            </nav>
+        </div>
     </header>
     <main class="flex-grow p-4 sm:p-6 md:p-10">
         {% with messages = get_flashed_messages(with_categories=true) %}
