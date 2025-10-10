@@ -204,7 +204,7 @@ def log_activity(action_template):
     return decorator
 
 # ----------------- Machine Learning Model ----------------- #
-MODEL_FILENAME = os.path.join(basedir, 'instance', 'copd_prediction_model.pkl')
+MODEL_FILENAME = os.path.join(basedir, 'copd_prediction_model.pkl')
 
 def train_and_save_model():
     data = { 'age': [65, 70, 55, 75], 'smoking_status': [2, 2, 0, 1], 'pack_years': [40, 50, 0, 30], 'history_of_asthma': [0, 1, 1, 0], 'fev1_fvc_ratio': [0.65, 0.68, 0.85, 0.72], 'copd_diagnosis': [1, 1, 0, 1] }
