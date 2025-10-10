@@ -84,6 +84,8 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
+
+
 # Ensure 'downloads' directory exists for Lab/Radiology reports
 os.makedirs(os.path.join(basedir, "downloads"), exist_ok=True)
 
@@ -368,6 +370,27 @@ def radiology_process_scan_request_worker(req_id, host, department, uhid, scan_t
                         req['status'] = 'Completed'
                         req['filename'] = dicom_file
                     break
+
+with app.app_context():
+    db.create_all()  # Create all database tables
+
+    # Check if the User table is empty, then create default users
+    if User.query.count() == 0:
+        print("Database is empty. Creating default users...")
+        admin = User(username='admin', role=Role.ADMIN)
+        admin.set_password('admin123')
+        doctor = User(username='dr_house', role=Role.DOCTOR)
+        doctor.set_password('doctor123')
+        db.session.add_all([admin, doctor])
+        db.session.commit()
+        print("Default users created.")
+
+    # Safely try to create the ML model file without crashing
+    try:
+        if not os.path.exists(MODEL_FILENAME):
+            train_and_save_model()
+    except Exception as e:
+        print(f"Warning: Could not create ML model file. Error: {e}")
 
 # ----------------- HTML Templates (as strings) ----------------- #
 base_template_html = """
