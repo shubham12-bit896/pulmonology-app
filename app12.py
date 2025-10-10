@@ -378,7 +378,7 @@ with app.app_context():
     if User.query.count() == 0:
         print("Database is empty. Creating default users...")
         admin = User(username='admin', role=Role.ADMIN)
-        admin.set_password('admin123')
+        admin.set_password('ad123')
         doctor = User(username='dr_house', role=Role.DOCTOR)
         doctor.set_password('doctor123')
         db.session.add_all([admin, doctor])
