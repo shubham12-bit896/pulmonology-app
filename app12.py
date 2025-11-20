@@ -1,29 +1,3 @@
-# Enterprise Blueprint for the Pulmonology Department Application
-#
-# This self-contained application has been architecturally refactored to demonstrate
-# best practices in security, interoperability (FHIR), and clinical workflow management.
-#
-# This version integrates standalone Laboratory and Radiology requesting modules and a Gemini AI assistant.
-#
-# To run this application:
-# 1. Make sure you have Python installed and the required libraries:
-#    pip install Flask Flask-SQLAlchemy scikit-learn pandas Flask-Login Werkzeug requests
-# 2. IMPORTANT: Set your Google AI API Key. Open your terminal and run this command before starting the app:
-#    For Windows (Command Prompt): set GEMINI_API_KEY=YOUR_API_KEY_HERE
-#    For Windows (PowerShell):   $env:GEMINI_API_KEY="YOUR_API_KEY_HERE"
-#    For macOS/Linux:            export GEMINI_API_KEY='YOUR_API_KEY_HERE'
-# 3. (OPTIONAL) To connect to a live main hospital app, set its URL:
-#    set MAIN_APP_API_URL=http://your-main-hospital-server.com/api/patient
-# 4. IMPORTANT: If you ran a previous version, please delete the 'instance/respiratory_clinic.db' file
-#    before running this new version to ensure the database schema is updated correctly.
-# 5. Save this code as app.py and run it from your terminal: python app.py
-# 6. Open your web browser and go to http://127.0.0.1:5000
-#
-# Login Credentials:
-# - Admin: username='admin', password='admin123'
-# - Doctor: username='dr_house', password='doctor123'
-# - IT Executive (New): Add via Admin panel.
-
 import os
 import pickle
 import datetime
@@ -2416,3 +2390,4 @@ if __name__ == '__main__':
             train_and_save_model()
 
     app.run(host='0.0.0.0', debug=True, port=5000)
+
